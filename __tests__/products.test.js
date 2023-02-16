@@ -36,6 +36,8 @@ const notValidProduct = {
   price: 100,
 };
 
+const notValidProductId = 23456123456;
+
 beforeAll(async () => {
   await mongoose.connect(process.env.MONGO_URL_TEST);
   const product = new ProductsModel({
@@ -68,10 +70,10 @@ describe("Test APIs", () => {
   // });
 
   // Fetching on/products/ should return a success status code and a body
-  // it("Should test that GET /products returns a success status and a body", async () => {
-  //   const response = await client.get("/products").expect(200);
-  //   console.log(`StCode:${response.statusCode} Body:${response.body}`);
-  // });
+  it("Should test that GET /products returns a success status and a body", async () => {
+    const response = await client.get("/products").expect(200);
+    console.log(`StCode:${response.statusCode} Body:${response.body}`);
+  });
 
   // Create new product on /products should return a valid _id and 201 in case of a valid product, 400 if not
   it("Should test that POST /products return a valid _id and 201 in case of a valid product, 400 if not", async () => {
@@ -86,6 +88,17 @@ describe("Test APIs", () => {
     }
   });
 
+  //When retrieving the /products/:id endpoint:
+  //expect requests to be 404 with a non-existing id, like 123456123456123456123456. Use a 24 character ID or casting to ObjectID will fail
+  //expect requests to return the correct product with a valid id
+  it("Should test that GET /products/:productsId returns the correct product with a valid id and 404 with a non-existing id", async () => {
+    const response = await client.get("/products/productId").expect(200);
+    if (response) {
+      expect(response.body._id);
+    } else {
+      expect(404);
+    }
+  });
   // it("Should test that POST /products with a not valid product returns a 400", async () => {
   //   await client.post("/products").send(notValidProduct).expect(400);
   // });
